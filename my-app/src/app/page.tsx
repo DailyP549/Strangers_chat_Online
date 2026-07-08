@@ -19,9 +19,16 @@ export default function Home() {
 
   const [status, setStatus] = useState("idle");
 const [roomId,setRoomId]=useState("")
+
+
+
   const startChat = () => {
     socket.emit("start");
     setStatus("waiting");
+  };
+    const next = () => {
+    socket.emit("next");
+   window.location.reload()
   };
 
   useEffect(() => {
@@ -29,9 +36,15 @@ const [roomId,setRoomId]=useState("")
    setRoomId(roomId)
    setStatus("chatting")
   });
+  socket.on("waiting",()=>{
+    setStatus("waiting")
+  });
+  socket.on("Partner_Left",()=>{
+     window.location.reload()
+  });
 
   return () => {
-    socket.off("matched");
+    socket.off();
   };
 }, []);
 
@@ -39,7 +52,7 @@ const [roomId,setRoomId]=useState("")
 
   return (
     <>
-      <Navbar />
+      <Navbar show={status!=="chatting"}/>
 
       <main className="relative min-h-screen w-full bg-gradient-to-br from-black via-zinc-900 to-black text-white overflow-hidden">
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl" />
@@ -147,6 +160,7 @@ const [roomId,setRoomId]=useState("")
 whileHover={{scale:1.05}} 
 whileTap={{scale:0.95}}
 className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-500  text-white font-medium"
+onClick={next}
 >
   <Shuffle size={16}/>
   Next

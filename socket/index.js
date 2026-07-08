@@ -99,8 +99,29 @@ socket.on("start",()=>{
 
     }else{
         waitingQueue.push(socket.id);
+        socket.emit("waiting")
     }
 })
+
+
+socket.on("next",()=>{
+    handleLeave(socket.id)
+})
+socket.on("disconnect",()=>handleLeave(socket.id))
+
+function handleLeave(id){
+ const index =   waitingQueue.indexOf(id)
+ if(index!==-1){
+    waitingQueue.splice(index,1)
+
+ }
+ const partner= activePairs.get(id)
+ if(partner){
+    io.to(partner).emit("Partner_Left")
+    activePairs.delete(id)
+    activePairs.delete(partner)
+ }
+}
 
 }); 
 
